@@ -19,7 +19,7 @@
 module Kitchen
   module Driver
     # Version string for Fog Kitchen driver
-    FOG_VERSION = '0.7.0'
+    FOG_VERSION = '0.7.1'
   end
 end
 
