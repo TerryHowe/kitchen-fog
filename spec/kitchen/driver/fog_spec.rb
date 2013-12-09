@@ -29,7 +29,9 @@ describe Kitchen::Driver::Fog do
   let(:state) { Hash.new }
 
   let(:instance) do
-    double(:name => 'potatoes', :logger => logger, :to_str => 'instance')
+    double(
+      :name => 'potatoes', :logger => logger, :to_str => 'instance'
+    )
   end
 
   let(:driver) do
@@ -40,8 +42,8 @@ describe Kitchen::Driver::Fog do
 
   describe '#initialize'do
     context 'default options' do
-      it 'defaults to no name' do
-        driver[:name].should eq(nil)
+      it 'defaults to no server name' do
+        driver[:server_name].should eq(nil)
       end
 
       it 'defaults to local user\'s SSH public key' do
@@ -82,7 +84,7 @@ describe Kitchen::Driver::Fog do
           :public_key_path => '/tmp',
           :username => 'admin',
           :port => '2222',
-          :name => 'puppy',
+          :server_name => 'puppy',
           :ssh_key => '/path/to/id_rsa'
         }
       end
@@ -134,7 +136,7 @@ describe Kitchen::Driver::Fog do
 
       it 'generates a server name in the absence of one' do
         driver.create(state)
-        driver[:name].should eq('a_monkey!')
+        driver[:server_name].should eq('a_monkey!')
       end
 
       it 'gets a proper hostname (IP)' do
@@ -271,7 +273,7 @@ describe Kitchen::Driver::Fog do
   describe '#create_server' do
     let(:config) do
       {
-        :name => 'hello',
+        :server_name => 'hello',
         :image_ref => 'there',
         :flavor_ref => 'captain',
         :public_key_path => 'tarpals'
@@ -295,7 +297,12 @@ describe Kitchen::Driver::Fog do
     end
 
     context 'a default config' do
-      before(:each) { @config = config.dup }
+      before(:each) do
+        @expected = config.merge(:name => config[:server_name])
+        @expected.delete_if do |k, v|
+          k == :server_name
+        end
+      end
 
       it 'creates the server using a compute connection' do
         state = {}
@@ -307,13 +314,18 @@ describe Kitchen::Driver::Fog do
     context 'a provided public key path' do
       let(:config) do
         {
-          :name => 'hello',
+          :server_name => 'hello',
           :image_ref => 'there',
           :flavor_ref => 'captain',
           :public_key_path => 'tarpals'
         }
       end
-      before(:each) { @config = config.dup }
+      before(:each) do
+        @expected = config.merge(:name => config[:server_name])
+        @expected.delete_if do |k, v|
+          k == :server_name
+        end
+      end
 
       it 'passes that public key path to Fog' do
         state = {}
@@ -325,14 +337,20 @@ describe Kitchen::Driver::Fog do
     context 'a provided key name' do
       let(:config) do
         {
-          :name => 'hello',
+          :server_name => 'hello',
           :image_ref => 'there',
           :flavor_ref => 'captain',
           :public_key_path => 'montgomery',
           :key_name => 'tarpals'
         }
       end
-      before(:each) { @config = config.dup }
+
+      before(:each) do
+        @expected = config.merge(:name => config[:server_name])
+        @expected.delete_if do |k, v|
+          k == :server_name
+        end
+      end
 
       it 'passes that key name to Fog' do
         state = {}

@@ -29,7 +29,7 @@ module Kitchen
     #
     # @author Jonathan Hartman <j@p4nt5.com>
     class Fog < Kitchen::Driver::SSHBase
-      default_config :name, nil
+      default_config :server_name, nil
       default_config :public_key_path, File.expand_path('~/.ssh/id_dsa.pub')
       default_config :username, 'root'
       default_config :port, '22'
@@ -38,7 +38,7 @@ module Kitchen
       default_config :upload_public_ssh_key, false
 
       def create(state)
-        config[:name] ||= generate_name(instance.name)
+        config[:server_name] ||= generate_name(instance.name)
         config[:disable_ssl_validation] and disable_ssl_validation
         server = create_server(state)
         unless config[:floating_ip_create].nil?
@@ -96,7 +96,7 @@ module Kitchen
       def create_server(state)
         server_configed = config[:server_create] || {}
         server_configed = server_configed.dup
-        server_configed[:name] = config[:name]
+        server_configed[:name] = config[:server_name]
         server_configed = convert_to_strings(server_configed)
         server = compute.servers.create(server_configed)
         state[:server_id] = server.id

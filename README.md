@@ -50,7 +50,7 @@ By default, a unique server name will be generated and the current user's SSH
 key will be used, though that behavior can be overridden with additional
 options:
 
-    name: [A UNIQUE SERVER NAME]
+    server_name: [A UNIQUE SERVER NAME]
     ssh_key: [PATH TO YOUR PRIVATE SSH KEY]
     upload_public_ssh_key: [TRUE UPLOADS PUBLIC KEY TO SERVER]
     public_key_path: [PATH TO YOUR SSH PUBLIC KEY]
