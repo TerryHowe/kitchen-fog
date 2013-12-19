@@ -438,10 +438,11 @@ describe Kitchen::Driver::Fog do
       let(:public_ip_address) { '5.5.5.5' }
       let(:private_ip_address) { '4.4.4.4' }
       let(:parsed_ips) { [[public_ip_address], [private_ip_address]] }
+      let(:no_method) { Proc.new { raise NoMethodError } }
 
       before do
-        allow(server).to receive(:public_ip_addresses).and_return { raise NoMethodError }
-        allow(server).to receive(:private_ip_addresses).and_return { raise NoMethodError }
+        allow(server).to receive(:public_ip_addresses).and_return(no_method)
+        allow(server).to receive(:private_ip_addresses).and_return(no_method)
       end
 
       it 'returns a public IPv4 address' do
