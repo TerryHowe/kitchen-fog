@@ -148,8 +148,12 @@ module Kitchen
         rescue Exception => e
           # See Fog issue: https://github.com/fog/fog/issues/2160
           addrs = server.addresses
-          addrs['public'] and pub = addrs['public'].map { |i| i['addr'] }
-          addrs['private'] and priv = addrs['private'].map { |i| i['addr'] }
+          if addrs.any?
+            addrs['public'] and pub = addrs['public'].map { |i| i['addr'] }
+            addrs['private'] and priv = addrs['private'].map { |i| i['addr'] }
+          else
+            pub, priv = server.public_ip_address, server.private_ip_address
+          end
         end
         pub, priv = parse_ips(pub, priv)
         pub.first || priv.first || raise(ActionFailed, 'Could not find an IP')

@@ -387,6 +387,8 @@ describe Kitchen::Driver::Fog do
     let(:addresses) { nil }
     let(:public_ip_addresses) { nil }
     let(:private_ip_addresses) { nil }
+    let(:public_ip_address) { nil }
+    let(:private_ip_address) { nil }
     let(:parsed_ips) { [[], []] }
     let(:driver) do
       d = Kitchen::Driver::Fog.new(config)
@@ -397,7 +399,10 @@ describe Kitchen::Driver::Fog do
     let(:server) do
       double(:addresses => addresses,
         :public_ip_addresses => public_ip_addresses,
-        :private_ip_addresses => private_ip_addresses)
+        :private_ip_addresses => private_ip_addresses,
+        :public_ip_address => public_ip_address,
+        :private_ip_address => private_ip_address
+      )
     end
 
     context 'both public and private IPs' do
@@ -425,6 +430,31 @@ describe Kitchen::Driver::Fog do
 
       it 'returns a private IPv4 address' do
         driver.send(:get_ip, server).should eq('5.5.5.5')
+      end
+    end
+
+    context 'no method for plural addresses' do
+      let(:addresses) { [] }
+      let(:public_ip_address) { '5.5.5.5' }
+      let(:private_ip_address) { '4.4.4.4' }
+      let(:parsed_ips) { [[public_ip_address], [private_ip_address]] }
+
+      before do
+        allow(server).to receive(:public_ip_addresses).and_return { raise NoMethodError }
+        allow(server).to receive(:private_ip_addresses).and_return { raise NoMethodError }
+      end
+
+      it 'returns a public IPv4 address' do
+        driver.send(:get_ip, server).should eq(public_ip_address)
+      end
+
+      context 'no public IP address' do
+        let(:public_ip_address) { nil }
+        let(:parsed_ips) { [[], [private_ip_address]] }
+
+        it 'returns a private IPv4 address' do
+          driver.send(:get_ip, server).should eq(private_ip_address)
+        end
       end
     end
 
