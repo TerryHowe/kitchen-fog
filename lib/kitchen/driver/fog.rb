@@ -46,7 +46,8 @@ module Kitchen
         else
           state[:hostname] = get_ip(server)
         end
-        wait_for_sshd(state[:hostname]) ; puts '(ssh ready)'
+        wait_for_sshd(state[:hostname], config[:username],
+          { :port => config[:port] }) ; info '(ssh ready)'
         if config[:upload_public_ssh_key]
           upload_public_ssh_key(state, config, server)
         end
